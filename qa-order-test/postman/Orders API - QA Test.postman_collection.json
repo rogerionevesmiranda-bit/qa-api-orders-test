@@ -1,0 +1,208 @@
+{
+	"info": {
+		"_postman_id": "f2a1a63a-13ba-49a0-9f98-718274963681",
+		"name": "Orders API - QA Test",
+		"description": "criada para testes de API simulados do sistema de pedidos, incluindo happy path, idempotência, validação de payload e fluxo assíncrono.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37690833"
+	},
+	"item": [
+		{
+			"name": "POST - Create Order (Happy Path)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code should be 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains orderId\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property(\"orderId\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Initial order status is PENDING\", function () {\r",
+							"    pm.expect(pm.response.json().status).to.eql(\"PENDING\");\r",
+							"});\r",
+							"pm.environment.set(\"orderId\", pm.response.json().orderId);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orderId\": \"order-001\",\r\n    \"customer\": \"João Rogério\",\r\n    \"total\": 120.50\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Get Order Status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code should be 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has status field\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property(\"status\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status is valid\", function () {\r",
+							"    const status = pm.response.json().status;\r",
+							"    pm.expect([\"PENDING\", \"PROCESSED\", \"FAILED\"]).to.include(status);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/{{orderId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST - Create Order (Idempotency)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code deve indicar idempotencia\", function () {\r",
+							"    pm.expect([200, 201]).to.include(pm.response.code);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"OrderId continua o mesmo\", function () {\r",
+							"    pm.expect(pm.response.json().orderId).to.eql(\"order-001\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orderId\": \"order-001\",\r\n    \"customer\": \"João Rogério\",\r\n    \"total\": 120.50\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST - Create Order (Invalid Payload)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code should be 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message is returned\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property(\"error\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customer\": \"João Rogério\",\r\n  \"total\": -50\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "orderId",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

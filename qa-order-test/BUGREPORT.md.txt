@@ -1,0 +1,17 @@
+Bug: API aceita payload inválido ao criar pedido
+
+ Ambiente
+- API de pedidos (ambiente simulado)
+- Método: POST /orders
+
+ Descrição
+Ao enviar um payload inválido para a criação de pedidos, a API aceita a requisição e retorna sucesso, quando o comportamento esperado seria rejeitar o pedido com erro de validação.
+
+Passos para reproduzir
+1. Enviar uma requisição POST para o endpoint `/orders`
+2. Utilizar o seguinte payload inválido:
+   ```json
+   {
+     "customer": "João Silva",
+     "total": -50
+   }
