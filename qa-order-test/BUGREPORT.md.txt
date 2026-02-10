@@ -14,4 +14,30 @@ Passos para reproduzir
    {
      "customer": "João Silva",
      "total": -50
+
    }
+Enviar a requisição
+
+Resultado esperado >
+
+A API deve retornar erro de validação
+
+Status HTTP 400 (Bad Request)
+
+Mensagem clara indicando campos inválidos
+
+Resultado atual >
+
+A API retorna status de sucesso
+
+O pedido é aceito mesmo com payload inválido
+
+Evidências >
+
+Teste automatizado de payload inválido configurado no Postman
+
+Script de validação no post-response esperando status 400
+
+Severidade >
+
+Alta - Esse problema permite a criação de pedidos com dados inconsistentes, o que pode gerar impactos financeiros, erros de processamento e problemas de integridade de dados.
